@@ -1,3 +1,4 @@
+[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-c66648af7eb3fe8bc4f294546bfd86ef473780cde1dea487d3c4ff354943c9ae.svg)](https://classroom.github.com/online_ide?assignment_repo_id=9416420&assignment_repo_type=AssignmentRepo)
 # Hash table set
 
 I will not ask you to implement a complete hash table yourself, although I don't think it will be a problem for such excellent students as yourself, but I have an implementation that I would like to ask you to improve. That implementaion can be found in `src/hashset.py`. The problem I have with it is that resizing is more expensive than it should be.
