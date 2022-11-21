@@ -7,7 +7,7 @@ from typing import (
 T = TypeVar('T')
 
 
-class HashSet(Generic[T]):
+class HashSet2(Generic[T]):
     """Set implementation using a hash table."""
 
     size: int
@@ -28,9 +28,9 @@ class HashSet(Generic[T]):
         for value in seq:
             self.add(value)
 
-    def _get_bin(self, element: T) -> list[T]:
+    def _get_bin(self, hash_val) -> list[T]: # The hash value should already be stored with the element, so we can simply use that value to get the index
         """Get the list (bin) that element should sit in."""
-        hash_val = hash(element)
+        #hash_val = hash(element)
         index = hash_val % self.size
         return self.array[index]
 
@@ -41,24 +41,28 @@ class HashSet(Generic[T]):
         self.used = 0
         self.array = [list() for _ in range(new_size)]
         for b in old_array:
-            for x in b:
-                self.add(x)
+            for (x, h) in b:
+                b = self._get_bin(h)
+                b.append((x, h))
+                self.used += 1
 
     def add(self, element: T) -> None:
         """Add element to the set."""
-        b = self._get_bin(element)
-        if element not in b:
-            b.append(element)
+        h = hash(element)
+        b = self._get_bin(h)
+        if (element, h) not in b:
+            b.append((element, h))
             self.used += 1
             if self.used > self.size / 2:
                 self._resize(int(2 * self.size))
 
     def remove(self, element: T) -> None:
         """Remove element from the set."""
-        b = self._get_bin(element)
-        if element not in b:
-            raise KeyError(element)
-        b.remove(element)
+        h = hash(element)
+        b = self._get_bin(h)
+        if (element, h) not in b:
+            raise KeyError((element, h))
+        b.remove((element, h))
         self.used -= 1
         if self.used < self.size / 4:
             self._resize(int(self.size / 2))
@@ -66,7 +70,7 @@ class HashSet(Generic[T]):
     def __iter__(self) -> Iterator[T]:
         """Iterate through all the elements in the set."""
         for b in self.array:
-            yield from b
+            yield from (element for (element, h) in b)
 
     def __bool__(self) -> bool:
         """Test if the set is non-empty."""
@@ -74,7 +78,9 @@ class HashSet(Generic[T]):
 
     def __contains__(self, element: T) -> bool:
         """Test if element is in the set."""
-        return element in self._get_bin(element)
+        h = hash(element)
+        b = self._get_bin(h)
+        return (element, h) in b
 
     def __repr__(self) -> str:
         """Get representation string."""
